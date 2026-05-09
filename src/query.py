@@ -1,13 +1,12 @@
 from langchain_groq import ChatGroq
-from langchain_chroma import Chroma
-from embeddings import get_embeddings
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
+from src.repository import get_retriever
+from src.config import DEFAULT_LLM_MODEL, DEFAULT_TEMPERATURE, DEFAULT_SUBJECT_PROMPT
+from src.token_tracker import format_chat_history
 
-CHROMA_DIR = "./chroma_db"
-
-PROMPT_TEMPLATE = """Respondé la pregunta con rigor académico y precisión conceptual.
+PHILOSOPHY_PROMPT = """Respondé la pregunta con rigor académico y precisión conceptual.
 
 Directrices:
 - Usá terminología precisa y específica de cada autor, corriente o época.
@@ -21,10 +20,13 @@ Directrices:
 - Enmarcá la distinción en el contexto del tránsito del mito al logos, pero evitá simplificaciones lineales del tipo "mito = falsedad" y "logos = verdad científica". No asocies el logos con la racionalidad ilustrada o moderna; presentalo como la estructura racional e inteligible del cosmos que el filósofo intenta comprender.
 - Usá ejemplos coherentes con el horizonte histórico del autor o período tratado. Si mencionás el mundo sensible, usá ejemplos de la naturaleza o la pólis (estrellas, leyes, objetos físicos), evitando tecnología o conceptos post-industriales.
 - Evitá introducciones generales o definiciones enciclopédicas que no aporten directamente a la pregunta.
+- Tené en cuenta el historial de la conversación para mantener coherencia con respuestas anteriores.
 - Basate prioritariamente en el contexto proporcionado. Solo complementá con conocimiento general cuando sea necesario y sin introducir contradicciones conceptuales.
 
 Contexto:
 {context}
+
+{chat_history}
 
 Pregunta: {question}
 
@@ -35,14 +37,8 @@ def _format_docs(docs):
     return "\n\n".join(doc.page_content for doc in docs)
 
 
-def _get_retriever(k: int = 7):
-    embeddings = get_embeddings()
-    vector_store = Chroma(
-        collection_name="pdf_docs",
-        embedding_function=embeddings,
-        persist_directory=CHROMA_DIR,
-    )
-    return vector_store.as_retriever(search_kwargs={"k": k})
+def _get_retriever(k: int = 7, materia: str = None):
+    return get_retriever(k=k, materia=materia)
 
 
 def _clean_response(text: str) -> str:
@@ -50,11 +46,30 @@ def _clean_response(text: str) -> str:
     return re.sub(r"</?think>", "", text, flags=re.IGNORECASE)
 
 
-def ask(question: str, k: int = 7, model: str = "llama-3.3-70b-versatile", temperature: float = 0.3):
-    retriever = _get_retriever(k=k)
+def _inject_history(template: str, history_text: str) -> str:
+    if not history_text:
+        return template.replace("{chat_history}", "")
+    if "{chat_history}" in template:
+        return template.replace("{chat_history}", history_text)
+    return template.replace(
+        "{question}",
+        f"Historial de la conversación:\n{history_text}\n\nPregunta: {{question}}"
+    )
+
+
+def ask(question: str, k: int = 7, model: str = DEFAULT_LLM_MODEL, temperature: float = DEFAULT_TEMPERATURE, materia: str = None, prompt_template: str = None, chat_history: list = None):
+    retriever = _get_retriever(k=k, materia=materia)
     docs = retriever.invoke(question)
 
-    prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
+    template = prompt_template or DEFAULT_SUBJECT_PROMPT
+
+    if chat_history:
+        history_text = format_chat_history(chat_history)
+        template = _inject_history(template, history_text)
+    else:
+        template = template.replace("{chat_history}", "")
+
+    prompt = ChatPromptTemplate.from_template(template)
     llm = ChatGroq(model=model, temperature=temperature)
 
     chain = (

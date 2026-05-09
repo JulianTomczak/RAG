@@ -1,0 +1,43 @@
+{
+  "pensar la ciencia hooy.pdf": {
+    "materia": "epistemologia",
+    "file_hash": "49bb3b3a7f577cf6f3db1253bc93de3c66c4f61b23aa95d49d717e06b29d0ac4"
+  },
+  "Comte (1).pdf": {
+    "materia": "epistemologia",
+    "file_hash": "50a6ebe137992cb389a1a4e1256f13f17b70f680db2d8bd6e6df82d35cb6e31c"
+  },
+  "Comte.pdf": {
+    "materia": "epistemologia",
+    "file_hash": "584a60d11c60683271456f83fdc440818a56e1157001c11c10a5826bc9c79423"
+  },
+  "Discurso del Método - René Descartes.pdf": {
+    "materia": "epistemologia",
+    "file_hash": "33aaed0d46e9271aae1e3ab307136eda730619c693b74056a6fba6c2962e43a4"
+  },
+  "El pensamiento antiguo de Rodolfo Mondolfo.pdf": {
+    "materia": "epistemologia",
+    "file_hash": "f2a0237d22b09947044d31066bbd418c93899bfecea37cc910376b1a87a6698d"
+  },
+  "immanuel-kant-critica-de-la-razon-pura1.pdf": {
+    "materia": "",
+    "file_hash": "8e3f66ab76d79877afdc25e48bfb495a68ff9c1c233a7e489f286d8343074c02"
+  },
+  "Kant-contexto-y-bio.pdf": {
+    "materia": "epistemologia",
+    "file_hash": "a0bc74928f528550f834269101ec98ebc30df4a02776e24ceb465f63bb8db042"
+  },
+  "Unidad 1 2022.pdf": {
+    "materia": "epistemologia",
+    "file_hash": "7505fd522d7d7081fbcfb6a291e8c7fc27630b2bb48d3fa948309cbb877f57a6"
+  },
+  "OrgaHardware2025.pdf": {
+    "materia": "organizacion de computadoras",
+    "file_hash": "f4b71b7f809763895b317a67dc81ec32a5d3764ec6ada0b2bb5cf63d7cf9880d"
+  },
+  "Organización de Computadoras 2026 (1).pdf": {
+    "materia": "organizacion de computadoras",
+    "chunks": 303,
+    "file_hash": "5084089d04c4455ab01c32690abe551a62472df98e4df673d1e9bd16e4c88773"
+  }
+}
